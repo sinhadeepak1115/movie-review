@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id String @id @default(uuid()) 
+  name String
+  email String @unique
+  reviews Review[]
+  ratings Rating[]
+  createdAt DateTime @default(now())
+
+}
+
+model Movie{
+id String @id @default(uuid())
+title String
+year Int
+director Int?
+reviews Review[]
+ratings Rating[]
+createdAt DateTime @default(now())
+}
+
+model Review{
+id String @id @default(uuid())
+content String
+movie Movie @relation(fields:[movieId], references:[id])
+user User @relation(fields:[userId], references:[id])
+}
+
+model Rating{
+  id String @id @default(uuid())
+  score Float @range(0,5)
+  movie Movie @relation(fileds: [movieId],references:[id])
+  user User @relation(fileds: [userId],references:[id])
+  movieId Int
+  userId Int
+  createdAt DateTime @default(now())
+  @@unique([movieId, userId])
+}
